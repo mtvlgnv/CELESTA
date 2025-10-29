@@ -29,7 +29,7 @@ function App() {
         setIsAuthenticated(result.authenticated);
         if (result.authenticated) {
           // Fetch user details
-          const userResponse = await fetch('http://localhost:5000/api/auth/me', {
+          const userResponse = await fetch('http://localhost:5001/api/auth/me', {
             credentials: 'include'
           });
           if (userResponse.ok) {

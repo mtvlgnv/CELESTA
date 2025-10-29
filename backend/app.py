@@ -21,7 +21,7 @@ def create_app():
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
     
     # Enable CORS for frontend communication
-    CORS(app, supports_credentials=True, origins=['http://localhost:3000'])
+    CORS(app, supports_credentials=True, origins=['http://localhost:3000', 'http://localhost:3001'])
     
     # Initialize database
     init_db()
@@ -67,9 +67,9 @@ if __name__ == '__main__':
     print("🚀 CELESTA API Server Starting...")
     print("="*50)
     print("📊 Stock/Crypto Trading Simulation Game")
-    print("🌐 API running on: http://localhost:5000")
-    print("📖 API Docs: http://localhost:5000")
+    print("🌐 API running on: http://localhost:5001")
+    print("📖 API Docs: http://localhost:5001")
     print("="*50 + "\n")
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)
 

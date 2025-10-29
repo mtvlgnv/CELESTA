@@ -18,13 +18,13 @@ function Dashboard({ user }) {
   const fetchData = useCallback(async () => {
     try {
       const [holdingsData, summaryData, historyData] = await Promise.all([
-        getHoldings(),
-        getPortfolioSummary(),
-        getPortfolioValueHistory(24),
+        getHoldings().catch(err => ({ success: false, holdings: [] })),
+        getPortfolioSummary().catch(err => ({ success: false, summary: { total_value: 0, profit_loss: 0, profit_loss_percent: 0, holdings_count: 0 } })),
+        getPortfolioValueHistory(24).catch(err => ({ success: false, snapshots: [] })),
       ]);
 
       if (holdingsData.success) {
-        setHoldings(holdingsData.holdings);
+        setHoldings(holdingsData.holdings || []);
       }
 
       if (summaryData.success) {
@@ -32,7 +32,7 @@ function Dashboard({ user }) {
       }
 
       if (historyData.success) {
-        setValueHistory(historyData.snapshots);
+        setValueHistory(historyData.snapshots || []);
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -134,9 +134,9 @@ function Dashboard({ user }) {
           </div>
         ) : (
           <div className="holdings-grid">
-            {holdings.map((holding) => (
+            {holdings.map((holding, index) => (
               <StockCard
-                key={holding.id}
+                key={holding.id || `holding-${index}`}
                 asset={holding}
                 onSell={handleSell}
                 showActions={true}

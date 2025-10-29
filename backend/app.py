@@ -1,5 +1,6 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, session
 from flask_cors import CORS
+from flask_session import Session
 import os
 from datetime import timedelta
 
@@ -16,12 +17,25 @@ def create_app():
     app = Flask(__name__)
     
     # Configuration
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production-please')
     app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_PERMANENT'] = True
+    app.config['SESSION_USE_SIGNER'] = True
+    app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
     
+    # Initialize Flask-Session
+    Session(app)
+    
     # Enable CORS for frontend communication
-    CORS(app, supports_credentials=True, origins=['http://localhost:3000', 'http://localhost:3001'])
+    CORS(app, 
+         supports_credentials=True, 
+         origins=['http://localhost:3000', 'http://localhost:3001'],
+         allow_headers=['Content-Type', 'Authorization'],
+         expose_headers=['Content-Type'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
     
     # Initialize database
     init_db()
@@ -38,11 +52,23 @@ def create_app():
             'name': 'CELESTA API',
             'version': '1.0.0',
             'description': 'Stock/Crypto Trading Simulation Game API',
+            'status': 'running',
             'endpoints': {
                 'auth': '/api/auth',
                 'portfolio': '/api/portfolio',
                 'market': '/api/market'
             }
+        })
+    
+    # Test session endpoint
+    @app.route('/api/test-session')
+    def test_session():
+        if 'test' not in session:
+            session['test'] = 'working'
+        return jsonify({
+            'success': True,
+            'session_working': True,
+            'session_id': session.get('test')
         })
     
     # Health check endpoint

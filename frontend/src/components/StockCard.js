@@ -13,7 +13,7 @@ function StockCard({ asset, onBuy, onSell, showActions = true }) {
     profit_loss_percent,
   } = asset;
 
-  const isProfitable = profit_loss >= 0;
+  const isProfitable = (profit_loss || 0) >= 0;
 
   return (
     <div className="stock-card">
@@ -52,10 +52,12 @@ function StockCard({ asset, onBuy, onSell, showActions = true }) {
 
       {showActions && (
         <div className="stock-actions">
-          <button className="btn btn-buy" onClick={() => onBuy(asset)}>
-            Buy
-          </button>
-          {quantity > 0 && (
+          {onBuy && (
+            <button className="btn btn-buy" onClick={() => onBuy(asset)}>
+              Buy
+            </button>
+          )}
+          {onSell && quantity > 0 && (
             <button className="btn btn-sell" onClick={() => onSell(asset)}>
               Sell
             </button>

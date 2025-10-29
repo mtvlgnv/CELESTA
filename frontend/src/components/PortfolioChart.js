@@ -85,15 +85,28 @@ function PortfolioChart({ data, title = "Portfolio Value" }) {
 
   useEffect(() => {
     if (data && data.length > 0) {
-      const formattedData = data.map((point) => ({
-        x: new Date(point.timestamp).getTime(),
-        y: point.value || point.total_value || point.close || 0,
-      }));
+      const formattedData = data.map((point) => {
+        const timestamp = point.timestamp || point.date;
+        const value = point.value || point.total_value || point.close || point.price || 0;
+        
+        return {
+          x: new Date(timestamp).getTime(),
+          y: parseFloat(value) || 0,
+        };
+      });
 
       setSeries([
         {
           name: title,
           data: formattedData,
+        },
+      ]);
+    } else {
+      // Set empty data if no data available
+      setSeries([
+        {
+          name: title,
+          data: [],
         },
       ]);
     }

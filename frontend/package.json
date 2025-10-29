@@ -4,13 +4,14 @@
   "description": "Stock/Crypto Trading Simulation Game Frontend",
   "private": true,
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "react-router-dom": "^6.20.0",
+    "ajv": "^8.17.1",
+    "apexcharts": "^3.45.1",
     "axios": "^1.6.2",
-    "apexcharts": "^3.45.0",
-    "react-apexcharts": "^1.4.1"
+    "react": "^18.2.0",
+    "react-apexcharts": "^1.4.1",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "react-scripts": "5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -36,4 +37,3 @@
     ]
   }
 }
-

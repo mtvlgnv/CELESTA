@@ -23,10 +23,11 @@ function Market() {
     try {
       const result = await getTrending();
       if (result.success) {
-        setTrending(result.trending);
+        setTrending(result.trending || { stocks: [], crypto: [] });
       }
     } catch (error) {
       console.error('Error fetching trending:', error);
+      setTrending({ stocks: [], crypto: [] });
     } finally {
       setLoading(false);
     }
@@ -49,23 +50,31 @@ function Market() {
 
   const handleSelectAsset = async (ticker, type) => {
     setSelectedAsset({ ticker, type });
+    setAssetInfo(null);
+    setHistoricalData([]);
     
     try {
       // Fetch asset info and historical data
       const [info, history] = await Promise.all([
-        getAssetInfo(ticker, type),
-        getHistoricalData(ticker, type, timePeriod),
+        getAssetInfo(ticker, type).catch(err => ({ success: false })),
+        getHistoricalData(ticker, type, timePeriod).catch(err => ({ success: false, data: [] })),
       ]);
 
       if (info.success) {
         setAssetInfo(info);
+      } else {
+        console.error('Failed to fetch asset info');
       }
 
       if (history.success) {
-        setHistoricalData(history.data);
+        setHistoricalData(history.data || []);
+      } else {
+        setHistoricalData([]);
       }
     } catch (error) {
       console.error('Error fetching asset details:', error);
+      setAssetInfo(null);
+      setHistoricalData([]);
     }
   };
 
@@ -75,10 +84,13 @@ function Market() {
       try {
         const result = await getHistoricalData(selectedAsset.ticker, selectedAsset.type, period);
         if (result.success) {
-          setHistoricalData(result.data);
+          setHistoricalData(result.data || []);
+        } else {
+          setHistoricalData([]);
         }
       } catch (error) {
         console.error('Error fetching historical data:', error);
+        setHistoricalData([]);
       }
     }
   };
@@ -207,37 +219,45 @@ function Market() {
         <div className="trending-section">
           <div className="trending-group">
             <h2>📈 Trending Stocks</h2>
-            <div className="trending-grid">
-              {trending.stocks.map((stock) => (
-                <div
-                  key={stock.ticker}
-                  className="trending-card"
-                  onClick={() => handleSelectAsset(stock.ticker, 'stock')}
-                >
-                  <h3>{stock.ticker}</h3>
-                  <p className="price">${stock.price?.toFixed(2)}</p>
-                </div>
-              ))}
-            </div>
+            {trending.stocks && trending.stocks.length > 0 ? (
+              <div className="trending-grid">
+                {trending.stocks.map((stock, index) => (
+                  <div
+                    key={stock.ticker || `stock-${index}`}
+                    className="trending-card"
+                    onClick={() => handleSelectAsset(stock.ticker, 'stock')}
+                  >
+                    <h3>{stock.ticker}</h3>
+                    <p className="price">${stock.price?.toFixed(2) || 'N/A'}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="empty-state">Loading trending stocks...</p>
+            )}
           </div>
 
           <div className="trending-group">
             <h2>₿ Trending Crypto</h2>
-            <div className="trending-grid">
-              {trending.crypto.map((crypto) => (
-                <div
-                  key={crypto.ticker}
-                  className="trending-card"
-                  onClick={() => handleSelectAsset(crypto.ticker, 'crypto')}
-                >
-                  <h3>{crypto.ticker}</h3>
-                  <p className="price">${crypto.price?.toFixed(2)}</p>
-                  <p className={`change ${crypto.change_24h >= 0 ? 'profit' : 'loss'}`}>
-                    {crypto.change_24h >= 0 ? '+' : ''}{crypto.change_24h?.toFixed(2)}%
-                  </p>
-                </div>
-              ))}
-            </div>
+            {trending.crypto && trending.crypto.length > 0 ? (
+              <div className="trending-grid">
+                {trending.crypto.map((crypto, index) => (
+                  <div
+                    key={crypto.ticker || `crypto-${index}`}
+                    className="trending-card"
+                    onClick={() => handleSelectAsset(crypto.ticker, 'crypto')}
+                  >
+                    <h3>{crypto.ticker}</h3>
+                    <p className="price">${crypto.price?.toFixed(2) || 'N/A'}</p>
+                    <p className={`change ${(crypto.change_24h || 0) >= 0 ? 'profit' : 'loss'}`}>
+                      {(crypto.change_24h || 0) >= 0 ? '+' : ''}{crypto.change_24h?.toFixed(2) || '0.00'}%
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="empty-state">Loading trending crypto...</p>
+            )}
           </div>
         </div>
       )}

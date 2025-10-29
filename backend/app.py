@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, session
 from flask_cors import CORS
-from flask_session import Session
 import os
 from datetime import timedelta
 
@@ -17,17 +16,11 @@ def create_app():
     app = Flask(__name__)
     
     # Configuration
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production-please')
-    app.config['SESSION_TYPE'] = 'filesystem'
-    app.config['SESSION_PERMANENT'] = True
-    app.config['SESSION_USE_SIGNER'] = True
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'celesta-super-secret-key-change-in-production')
     app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
-    
-    # Initialize Flask-Session
-    Session(app)
     
     # Enable CORS for frontend communication
     CORS(app, 

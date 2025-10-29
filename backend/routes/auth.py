@@ -18,8 +18,10 @@ def signup():
     result = create_user(username, email, password)
     
     if result['success']:
+        session.clear()
         session['user_id'] = result['user_id']
         session['username'] = username
+        session.permanent = True
         return jsonify({'success': True, 'message': 'User created successfully'}), 201
     else:
         return jsonify(result), 400
@@ -38,8 +40,10 @@ def login():
     result = authenticate_user(username, password)
     
     if result['success']:
+        session.clear()
         session['user_id'] = result['user_id']
         session['username'] = result['username']
+        session.permanent = True
         return jsonify({'success': True, 'user': {'id': result['user_id'], 'username': result['username']}}), 200
     else:
         return jsonify(result), 401
